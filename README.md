@@ -16,7 +16,7 @@ To use this buildpack, you should prepare `.buildpacks` file that contains this 
 
 ```
 $ cat .buildpacks
-https://github.com/Scalingo/graphicsmagick-buildpack.git
+https://github.com/jcamblan/scalingo-buildpack-vips.git
 https://github.com/Scalingo/ruby-buildpack.git
 ```
 
