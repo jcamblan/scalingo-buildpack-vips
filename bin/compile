@@ -9,7 +9,6 @@ fi
 
 BUILD_DIR=$1
 CACHE_DIR=$2
-ENV_DIR=$3
 
 BIN_PATH="$BUILD_DIR/bin"
 LIB_PATH="$BUILD_DIR/vendor/vips/lib"
@@ -40,5 +39,16 @@ mv $VIPS_BINARIES/* $BIN_PATH/
 echo "-----> Moving libs to the right place"
 mv $VIPS_LIBS/* $LIB_PATH/
 
+echo "-----> Compile VIPS and store in in vendor/vips"
+./configure --prefix $1/vendor/vips
+make V=0 -J 4
+make install
+
 echo "-----> Cleaning up"
 rm -rf $VIPS_PATH
+
+echo "-----> Preparing runtime environment"
+mkdir -p $BUILD_DIR/.profile.d
+echo "export PATH=\$PATH:/app/vendor/vips/bin" > $BUILD_DIR/.profile.d/vips.sh
+echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/app/vendor/vips/lib" >> $BUILD_DIR/.profile.d/vips.sh
+echo "export LIBRARY_PATH=\$LD_LIBRARY_PATH:/app/vendor/vips/lib" >> $BUILD_DIR/.profile.d/vips.sh
