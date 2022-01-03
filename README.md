@@ -20,7 +20,7 @@ https://github.com/Scalingo/graphicsmagick-buildpack.git
 https://github.com/Scalingo/ruby-buildpack.git
 ```
 
-The first buildpack will install GraphicsMagick utilities in `/app/bin`, the
+The first buildpack will install libvips utilities in `/app/bin`, the
 second will handle the deployment of your ruby application. For any other
 technology, go to
 [http://doc.scalingo.com/buildpacks/](http://doc.scalingo.com/buildpacks/)
