@@ -2,14 +2,18 @@
 # bin/compile <build-dir> <cache-dir>
 
 BUILD_DIR=$1
+CACHE_DIR=$2
 
-mkdir $BUILD_DIR/tmp-vips
-cd $BUILD_DIR/tmp-vips
+VIPS_VERSION=8.14.2
 
-# Download VIPS
-wget "https://github.com/libvips/libvips/releases/download/v8.12.1/vips-8.12.1.tar.gz" -O vips.tar.gz
-tar -xvf vips.tar.gz
-cd vips-8.12.1
+cd $CACHE_DIR/
+
+# Download VIPS (or get from cache?)
+if [ ! -d vips-$VIPS_VERSION ]; then
+    wget "https://github.com/libvips/libvips/releases/download/v$VIPS_VERSION/vips-$VIPS_VERSION.tar.xz" -O vips-$VIPS_VERSION.tar.xz
+    tar -xvf vips-$VIPS_VERSION.tar.xz
+fi
+cd vips-$VIPS_VERSION
 
 # Compile VIPS and store in in vendor/vips
 ./configure --prefix $1/vendor/vips

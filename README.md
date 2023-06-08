@@ -2,7 +2,7 @@ vips-buildpack
 =========================
 
 This project is a Scalingo [buildpack](http://doc.scalingo.com/buildpacks) to
-use latest version of [libvips](www.libvips.org) (8.12.1)
+use latest version of [libvips](www.libvips.org) (8.14.2)
 alongside your app.
 
 It doesn't do anything else, you have to use it alongside another buildpack thanks to the [multi-buildpack](https://github.com/Scalingo/multi-buildpack).
