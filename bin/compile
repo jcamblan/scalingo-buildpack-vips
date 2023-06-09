@@ -2,19 +2,44 @@
 # bin/compile <build-dir> <cache-dir>
 
 BUILD_DIR=$1
+CACHE_DIR=$2
 
-mkdir $BUILD_DIR/tmp-vips
-cd $BUILD_DIR/tmp-vips
+# VIPS 8.13 and above uses a new build system, stick to a lower version
+# (the new build system needs several dependencies, like cmake and meson)
+VIPS_VERSION=8.12.2
+source /etc/os-release
+OS_VERSION="$ID-$VERSION_ID"
+PREBUILT_VIPS_CACHE="$CACHE_DIR/$OS_VERSION/vendor/vips-$VIPS_VERSION"
 
-# Download VIPS
-wget "https://github.com/libvips/libvips/releases/download/v8.12.1/vips-8.12.1.tar.gz" -O vips.tar.gz
-tar -xvf vips.tar.gz
-cd vips-8.12.1
+# build into a cache dir if it does not exist
+# Note that when changing Scalingo stack we should rebuild,
+# so the os release is included in the cache path as well as the version
+if [ ! -d $PREBUILT_VIPS_CACHE ]; then
+    cd $CACHE_DIR/
 
-# Compile VIPS and store in in vendor/vips
-./configure --prefix $1/vendor/vips
-make
-make install
+    # Download VIPS if not already in the cache
+    if [ ! -d "vips-$VIPS_VERSION" ]; then
+        wget "https://github.com/libvips/libvips/releases/download/v$VIPS_VERSION/vips-$VIPS_VERSION.tar.gz" -O vips-$VIPS_VERSION.tar.gz
+        tar -xvf vips-$VIPS_VERSION.tar.gz
+    fi
+    cd vips-$VIPS_VERSION
+
+    # Compile VIPS and store in in vendor/vips
+    ./configure --prefix "$PREBUILT_VIPS_CACHE"
+    make -j$(nproc)
+    make install
+
+    if [ $? -ne 0 ]; then
+        cd ..
+        echo "Install failed, removing cache dirs"
+        rm -R vips-$VIPS_VERSION
+        rm -R "$PREBUILT_VIPS_CACHE"
+        exit 1
+    fi
+fi
+echo "Copying vips from cache dir into build dir"
+mkdir -p "$BUILD_DIR/vendor"
+cp -R "$PREBUILT_VIPS_CACHE" "$BUILD_DIR/vendor/vips"
 
 # Preparing runtime environment
 mkdir -p $BUILD_DIR/.profile.d
